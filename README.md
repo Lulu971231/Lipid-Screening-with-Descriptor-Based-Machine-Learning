@@ -4,16 +4,16 @@ README: Lipid Screening with Descriptor-Based Machine Learning
 
 Project Overview
 ----------------
-This project implements a descriptor-based machine learning workflow for virtual lipid screening, aiming to identify promising lipid candidates from a large combinatorial space of molecular components.
-The workflow is designed for screening and structure preference analysis, rather than strict model benchmarking. It integrates molecular descriptors, supervised learning, and ensemble-based inference to extract robust structural signals for downstream experimental validation.
+This project implements a descriptor-based machine learning workflow for virtual lipid screening, aiming to identify promising lipid candidates from a large combinatorial space of molecular components. The workflow is designed for screening and structure preference analysis, rather than strict model benchmarking. It integrates molecular descriptors, supervised learning, and ensemble-based inference to extract robust structural signals for downstream experimental validation.
 The main steps include:
-- Molecular descriptor generation from SMILES using PaDEL.
-- Feature construction for experimentally measured lipid candidates.
-- Binary classification model training with class balancing (SMOTE).
-- Large-scale virtual lipid library construction via combinatorial assembly.
-- Ensemble XGBoost-based screening of virtual candidates.
-- Statistical analysis of component-level occurrence frequencies.
-The primary classifier used is XGBoost with GPU acceleration.
+1. Molecular descriptor generation from SMILES using PaDEL.
+2. Feature construction for experimentally measured lipid candidates.
+3. Binary classification model training with class balancing (SMOTE).
+4. Nested cross-validation with Bayesian hyperparameter optimization
+   (XGBoost, Random Forest, Logistic Regression).
+5. Large-scale virtual lipid library construction via combinatorial assembly.
+6. Ensemble XGBoost-based screening of virtual candidates.
+7. Statistical analysis of component-level occurrence frequencies.
 
 Required Python Packages
 -------------------------
@@ -29,23 +29,29 @@ Make sure the following Python packages are installed:
 You can install them using pip:
 
     pip install pandas numpy imbalanced-learn scikit-learn xgboost padelpy matplotlib
+    
+    or
+
+    pip install -r requirements.txt
 
 Input Files
 -----------
-The script requires the following input files:
+**data/basic_smiles.csv**
+CSV file with columns flag and smiles, containing SMILES strings for all
+molecular building blocks (aldehyde tails, amine heads, phosphate linkers).
 
-1. basic_smiles.xlsx  
-   Excel file containing a column named `SMILES` with SMILES strings of basic molecular components.
+**data/autodevice_results.csv**
+CSV file containing experimental transfection data with columns:
 
-2. autodevice-results1215.xlsx  
-   Excel file containing experimental data for known lipid formulations, with columns:
-- coma-l: Component 1
-- comP1-P8: Component 2 
-- com1-20: Component 3 
-- average: Experimental performance metric
+coma_l: Aldehyde tail component identifier
+comP1_P8: Phosphate linker identifier
+com1_20: Amine head component identifier
+average: Mean transfection efficiency (RLU)
+
 The average column is converted into a binary label:
-- Label = 1 if average ≥ 50000
-- Label = 0 otherwise
+Label = 1 if average >= 50,000
+Label = 0 otherwise
+See data/DATA_DICTIONARY.md for full column descriptions.
 
 Optional:
 - basic_descriptors0702.csv  
@@ -61,9 +67,9 @@ Output Files
 
 How to Run
 ----------
-1. Ensure that basic_smiles.xlsx and autodevice-results1215.xlsx are present in your working directory.
-2. Run gen_descriptors_and_pick_up_model.py.
-3. Run pick-component.py.
+1. Ensure that basic_smiles.csv and autodevice-results.csv are present in your working directory.
+2. Run scripts/run_model_selection.py.
+3. Run scripts/run_virtual_screening.py.
 
 Output Interpretation
 ---------------------
@@ -74,9 +80,8 @@ At the end of execution, the script prints:
 
 Notes
 -----
-- PaDEL (used via padelpy) requires Java and must be properly set up in your environment.
 - Large virtual libraries and multiple ensemble runs may consume significant memory and GPU resources.
-- You can modify the activity threshold (150000) and the ensemble vote threshold (0.6) in the code to suit your data.
+- You can modify the activity threshold and the ensemble vote threshold in the code to suit your data.
 - This workflow is designed for virtual screening and structure preference analysis, not for unbiased model benchmarking.
 - SMOTE is used to enhance minority class learning and may introduce optimistic bias if used for strict performance evaluation.
 - Results should be interpreted as model-guided hypotheses, not definitive predictions.
