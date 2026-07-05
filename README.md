@@ -80,6 +80,7 @@ At the end of execution, the script prints:
 
 Notes
 -----
+- Java Runtime Environment (JRE) 6 or higher. (Note: The underlying PaDEL-Descriptor is bundled within the padelpy package; no separate download is required.)
 - Large virtual libraries and multiple ensemble runs may consume significant memory and GPU resources.
 - You can modify the activity threshold and the ensemble vote threshold in the code to suit your data.
 - This workflow is designed for virtual screening and structure preference analysis, not for unbiased model benchmarking.
