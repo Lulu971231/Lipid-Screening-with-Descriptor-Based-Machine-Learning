@@ -60,9 +60,9 @@ def build_feature_matrix():
 
     # Load experimental formulation data
     results_df = pd.read_csv(RESULTS_FILE)
-    comp_tails = results_df["coma_l"].astype(str).tolist()
-    comp_phosphates = results_df["comP1_P8"].astype(str).tolist()
-    comp_amines = results_df["com1_20"].astype(str).tolist()
+    comp_tails = results_df["coma-l"].astype(str).tolist()
+    comp_phosphates = results_df["comP1-P8"].astype(str).tolist()
+    comp_amines = results_df["com1-20"].astype(str).tolist()
     n_formulations = len(comp_tails)
 
     # Load descriptor lookup table
